@@ -14,7 +14,7 @@ export default function Chat() {
       <header className="sticky top-0 z-10 border-b border-zinc-100 dark:border-zinc-900 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <h1 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-            Brane
+            brane
           </h1>
           <button
             type="button"
@@ -47,7 +47,7 @@ export default function Chat() {
               }`}
             >
               <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-2">
-                {message.role === "user" ? "You" : "Assistant"}
+                {message.role === "user" ? "you" : "brane"}
               </div>
               <div className="space-y-3">
                 {message.parts.map((part, i) => {
@@ -108,7 +108,7 @@ export default function Chat() {
           {status === "streaming" && (
             <div className="mb-8">
               <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-2">
-                Assistant
+                brane
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 bg-zinc-400 dark:bg-zinc-600 rounded-full animate-pulse" />

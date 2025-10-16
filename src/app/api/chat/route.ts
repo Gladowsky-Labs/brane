@@ -28,30 +28,45 @@ function slugify(s: string) {
   return s.trim().replace(/\s+/g, "_");
 }
 
+function formatWithTzOffset(d: Date) {
+  const pad = (n: number, len = 2) => String(n).padStart(len, "0");
+  const y = d.getFullYear();
+  const m = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mm = pad(d.getMinutes());
+  const ss = pad(d.getSeconds());
+  // const wd = pad(d.getWeekday());
+
+  // const day
+
+  const tzMin = d.getTimezoneOffset(); // minutes behind UTC; e.g., 240 for EDT
+  const sign = tzMin > 0 ? "-" : "+";
+  const abs = Math.abs(tzMin);
+  const tzh = pad(Math.floor(abs / 60));
+  const tzm = pad(abs % 60);
+
+  return `${y}-${m}-${day}T${hh}:${mm}:${ss}${sign}${tzh}:${tzm}`;
+}
+
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
+  const now = new Date();
+  const formattedDate = formatWithTzOffset(now);
+
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: openai("gpt-5-nano-2025-08-07"),
     messages: convertToModelMessages(messages),
     system:
       "You are an assistant whos main job is to help Jack with his day to " +
       "day tasks and anything he could need. He is a student at " +
       "Northeastern University and you are the main way to keep track of " +
       "up coming assignments, classes, meetings, and just anything in " +
-      "general going on in his life.",
+      "general going on in his life." +
+      `The current date is ${formattedDate}`,
     stopWhen: stepCountIs(5),
     tools: {
-      weather: tool({
-        description: "Get the weather in a location (fahrenheit)",
-        inputSchema: z.object({
-          location: z.string().describe("The location to get the weather for"),
-        }),
-        execute: async ({ location }) => {
-          const temperature = Math.round(Math.random() * (90 - 32) + 32);
-          return { location, temperature };
-        },
-      }),
       add_classes: tool({
         description: "Add a class that the user is taking.",
         inputSchema: z.object({
