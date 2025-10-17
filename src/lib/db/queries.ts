@@ -190,3 +190,13 @@ export async function getAssignments(courseCode?: string) {
     return assignments ?? null;
   }
 }
+
+export async function updateAssignmentStatus(id: number, status: boolean) {
+  const assignment = await db
+    .update(assignmentsTable)
+    .set({ completed: status })
+    .where(eq(assignmentsTable.id, id))
+    .returning();
+
+  return assignment;
+}

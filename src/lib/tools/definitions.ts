@@ -57,9 +57,19 @@ export const getUpcomingAssignmentsSchema = z.object({
     ),
 });
 
+export const updateAssignmentStatusSchema = z.object({
+  id: z.number().int().positive().describe("ID of the assignment to update"),
+  status: z
+    .enum(["pending", "completed"])
+    .describe("New status of the assignment (pending, complete"),
+});
+
 export type AddCourseInput = z.infer<typeof addCourseSchema>;
 export type GetCoursesInput = z.infer<typeof getCoursesSchema>;
 export type AddAssignmentInput = z.infer<typeof addAssignmentSchema>;
 export type GetUpcomingAssignmentsInput = z.infer<
   typeof getUpcomingAssignmentsSchema
+>;
+export type UpdateAssignmentStatusInput = z.infer<
+  typeof updateAssignmentStatusSchema
 >;

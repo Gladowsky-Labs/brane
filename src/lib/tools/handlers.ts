@@ -9,6 +9,7 @@ import {
   GetCoursesInput,
   AddAssignmentInput,
   GetUpcomingAssignmentsInput,
+  UpdateAssignmentStatusInput,
 } from "./definitions";
 
 import {
@@ -18,6 +19,7 @@ import {
   getCourse,
   createAssignment,
   getAssignments,
+  updateAssignmentStatus,
 } from "@/lib/db/queries";
 
 import { parseDueDate } from "@/lib/utils";
@@ -81,4 +83,20 @@ export async function handleGetUpcomingAssignments(
   }
 
   return assignments;
+}
+
+export async function handleUpdateAssignmentStatus(
+  input: UpdateAssignmentStatusInput,
+) {
+  const { id, status } = input;
+
+  if (status === "completed") {
+    const assignment = await updateAssignmentStatus(id, true);
+    return assignment;
+  } else if (status === "pending") {
+    const assignment = await updateAssignmentStatus(id, false);
+    return assignment;
+  } else {
+    throw new Error(`Invalid status: ${status}`);
+  }
 }

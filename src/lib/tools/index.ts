@@ -5,6 +5,7 @@ import {
   getCoursesSchema,
   addAssignmentSchema,
   getUpcomingAssignmentsSchema,
+  updateAssignmentStatusSchema,
 } from "./definitions";
 
 import {
@@ -12,6 +13,7 @@ import {
   handleGetCourses,
   handleAddAssignment,
   handleGetUpcomingAssignments,
+  handleUpdateAssignmentStatus,
 } from "./handlers";
 
 export const tools = {
@@ -36,5 +38,11 @@ export const tools = {
     description: "Get upcoming assignments",
     inputSchema: getUpcomingAssignmentsSchema,
     execute: handleGetUpcomingAssignments,
+  }),
+  updateAssignmentStatus: tool({
+    name: "update_assignment_status",
+    description: "Update the status of an assignment",
+    inputSchema: updateAssignmentStatusSchema,
+    execute: handleUpdateAssignmentStatus,
   }),
 };
