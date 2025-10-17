@@ -46,6 +46,9 @@ Retrieves assignments:
 - No params: Returns all assignments
 - `courseCode`: Returns assignments for a specific course
 
+### `updateAssignment(assignmentId: number, title?: string, dueDate?: Date, description?: string, priority?: Priority)`
+Updates an existing assignment. Throws error if assignment not found. Returns the updated assignment object or `null`.
+
 ## Types
 
 - `Schedule`: Defined in `src/lib/types.ts`

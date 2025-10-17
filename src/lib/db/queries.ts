@@ -191,10 +191,19 @@ export async function getAssignments(courseCode?: string) {
   }
 }
 
-export async function updateAssignmentStatus(id: number, status: boolean) {
+export async function updateAssignment(
+  id: number,
+  updates: Partial<{
+    title: string;
+    description: string | null;
+    dueDate: Date;
+    completed: boolean;
+    priority: "low" | "medium" | "high" | null;
+  }>,
+) {
   const assignment = await db
     .update(assignmentsTable)
-    .set({ completed: status })
+    .set(updates)
     .where(eq(assignmentsTable.id, id))
     .returning();
 

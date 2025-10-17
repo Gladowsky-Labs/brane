@@ -9,7 +9,7 @@ import {
   GetCoursesInput,
   AddAssignmentInput,
   GetUpcomingAssignmentsInput,
-  UpdateAssignmentStatusInput,
+  UpdateAssignmentInput,
 } from "./definitions";
 
 import {
@@ -19,7 +19,7 @@ import {
   getCourse,
   createAssignment,
   getAssignments,
-  updateAssignmentStatus,
+  updateAssignment,
 } from "@/lib/db/queries";
 
 import { parseDueDate } from "@/lib/utils";
@@ -85,18 +85,43 @@ export async function handleGetUpcomingAssignments(
   return assignments;
 }
 
-export async function handleUpdateAssignmentStatus(
-  input: UpdateAssignmentStatusInput,
-) {
-  const { id, status } = input;
+export async function handleUpdateAssignment(input: UpdateAssignmentInput) {
+  const { id, title, description, dueDate, status, priority } = input;
 
-  if (status === "completed") {
-    const assignment = await updateAssignmentStatus(id, true);
-    return assignment;
-  } else if (status === "pending") {
-    const assignment = await updateAssignmentStatus(id, false);
-    return assignment;
-  } else {
-    throw new Error(`Invalid status: ${status}`);
+  // Build updates object with only provided fields
+  const updates: Partial<{
+    title: string;
+    description: string | null;
+    dueDate: Date;
+    completed: boolean;
+    priority: "low" | "medium" | "high" | null;
+  }> = {};
+
+  if (title !== undefined) {
+    updates.title = title;
   }
+
+  if (description !== undefined) {
+    updates.description = description;
+  }
+
+  if (dueDate !== undefined) {
+    updates.dueDate = parseDueDate(dueDate);
+  }
+
+  if (status !== undefined) {
+    updates.completed = status === "completed";
+  }
+
+  if (priority !== undefined) {
+    updates.priority = priority;
+  }
+
+  // Ensure at least one field is being updated
+  if (Object.keys(updates).length === 0) {
+    throw new Error("No fields provided to update");
+  }
+
+  const assignment = await updateAssignment(id, updates);
+  return assignment;
 }
