@@ -61,30 +61,6 @@ export default function Chat() {
                           {part.text}
                         </div>
                       );
-                    case "tool-weather":
-                      return showToolCalls ? (
-                        <div
-                          key={`${message.id}-${i}`}
-                          className="text-xs bg-zinc-50 dark:bg-zinc-900 rounded-lg p-3 border border-zinc-100 dark:border-zinc-800"
-                        >
-                          <div className="text-zinc-500 dark:text-zinc-400 mb-2 font-medium">
-                            Tool Call: weather
-                          </div>
-                          <pre className="text-zinc-600 dark:text-zinc-300 overflow-x-auto">
-                            {JSON.stringify(
-                              {
-                                type: part.type,
-                                input: part.input?.location,
-                                output: part.output?.location,
-                                temperature: part.output?.temperature,
-                                toolCallId: part.toolCallId,
-                              },
-                              null,
-                              2,
-                            )}
-                          </pre>
-                        </div>
-                      ) : null;
                     case "tool-get_classes":
                       return showToolCalls ? (
                         <div
