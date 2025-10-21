@@ -3,6 +3,81 @@ import { useChat } from '@ai-sdk/react';
 import { useState } from 'react';
 import type { BraneUIMessage } from './api/chat/route';
 
+// Helper function to generate brief summaries from tool parameters
+function generateToolSummary(
+  toolName: string,
+  args: Record<string, unknown> | undefined,
+): string {
+  if (!args || Object.keys(args).length === 0) return '';
+
+  // Extract key information based on tool type
+  switch (toolName) {
+    case 'searchInternet':
+      return (args.query || '') as string;
+    default: {
+      // Generic fallback: show first meaningful value
+      const firstValue = Object.values(args)[0];
+      return firstValue ? String(firstValue) : '';
+    }
+  }
+}
+
+// ToolCall component with expand/collapse functionality
+function ToolCall({
+  toolName,
+  part,
+}: {
+  toolName: string;
+  // biome-ignore lint/suspicious/noExplicitAny: UI parts have different types
+  part: any;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const summary = generateToolSummary(toolName, part.args);
+
+  return (
+    <div
+      onClick={() => setIsExpanded(!isExpanded)}
+      className="text-xs bg-zinc-100 dark:bg-zinc-900 rounded-md p-2.5 border border-zinc-200 dark:border-zinc-800 cursor-pointer hover:bg-zinc-150 dark:hover:bg-zinc-850 transition-colors my-2"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-zinc-600 dark:text-zinc-400 font-mono text-[11px]">
+            {toolName}
+          </span>
+          {summary && (
+            <>
+              <span className="text-zinc-300 dark:text-zinc-700">·</span>
+              <span className="text-zinc-500 dark:text-zinc-500 truncate text-[11px]">
+                {summary}
+              </span>
+            </>
+          )}
+        </div>
+        <svg
+          className={`w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 transition-transform flex-shrink-0 ${
+            isExpanded ? 'rotate-180' : ''
+          }`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+      {isExpanded && (
+        <pre className="mt-2.5 pt-2.5 border-t border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 overflow-x-auto text-[10px] font-mono">
+          {JSON.stringify(part, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+}
+
 export default function Chat() {
   const [input, setInput] = useState('');
   const { messages, sendMessage } = useChat<BraneUIMessage>();
@@ -25,17 +100,31 @@ export default function Chat() {
                 }`}
               >
                 {message.parts.map((part, i) => {
-                  switch (part.type) {
-                    case 'text':
-                      return (
-                        <div
-                          key={`${message.id}-${i}`}
-                          className="whitespace-pre-wrap break-words"
-                        >
-                          {part.text}
-                        </div>
-                      );
+                  // Handle text parts
+                  if (part.type === 'text') {
+                    return (
+                      <div
+                        key={`${message.id}-${i}`}
+                        className="whitespace-pre-wrap break-words"
+                      >
+                        {part.text}
+                      </div>
+                    );
                   }
+
+                  // Handle all tool calls dynamically
+                  if (part.type.startsWith('tool-')) {
+                    const toolName = part.type.replace('tool-', '');
+                    return (
+                      <ToolCall
+                        key={`${message.id}-${i}`}
+                        toolName={toolName}
+                        part={part}
+                      />
+                    );
+                  }
+
+                  return null;
                 })}
               </div>
             </div>
