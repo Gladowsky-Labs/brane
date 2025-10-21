@@ -1,15 +1,27 @@
-import { streamText, UIMessage, convertToModelMessages } from 'ai';
+import { streamText, 
+         UIMessage, 
+         convertToModelMessages, 
+         validateUIMessages, 
+         Experimental_Agent as Agent, 
+         stepCountIs,   
+         Experimental_InferAgentUIMessage as InferAgentUIMessage,
+         } from 'ai';
+
+const brane = new Agent({
+  model: "moonshotai/kimi-k2-0905",
+  system: "You are a helpful assistant named brane.",
+  stopWhen: stepCountIs(5),
+});
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+export async function POST(request: Request) {
+  const { messages } = await request.json();
 
-  const result = streamText({
-    model: "moonshotai/kimi-k2-0905",
-    messages: convertToModelMessages(messages),
+  return brane.respond({
+    messages: await validateUIMessages({ messages }),
   });
-
-  return result.toUIMessageStreamResponse();
 }
+
+export type BraneUIMessage = InferAgentUIMessage<typeof brane>;
