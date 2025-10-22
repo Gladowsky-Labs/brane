@@ -5,6 +5,7 @@ import type { MemorySearchResult } from '../types';
 
 /**
  * Generate embedding for a text string
+ * Currently uses 'google/gemini-embedding-001' model, returns 3072-dimensional vector
  */
 export async function embedText(text: string): Promise<number[]> {
   const result = await embed({

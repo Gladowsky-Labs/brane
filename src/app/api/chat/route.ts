@@ -50,7 +50,9 @@ export async function POST(request: Request) {
              - searchInternet: Search the web for information
              - storeMemory: Store new memories about the user, you can use this without the user asking you too
              - searchMemories: Search for relevant memories about the user
-             - updateMemory: Update existing memories by ID`,
+             - updateMemory: Update existing memories by ID
+             
+             On initial user greetings, you may want to search for relevant memories to personalize your response. (USE THE searchMemories TOOL)`,
     tools,
     stopWhen: stepCountIs(5),
   });
