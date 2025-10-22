@@ -1,7 +1,10 @@
 'use client';
 import { useChat } from '@ai-sdk/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import type { BraneUIMessage } from './api/chat/route';
+import { TopBar } from '@/components/top-bar';
+import { authClient } from '@/lib/auth/client';
 
 // Helper function to generate brief summaries from tool parameters
 function generateToolSummary(
@@ -14,6 +17,12 @@ function generateToolSummary(
   switch (toolName) {
     case 'searchInternet':
       return (args.query || '') as string;
+    case 'storeMemory':
+      return `"${(args.text || '') as string}"`.slice(0, 50);
+    case 'searchMemories':
+      return `query: "${(args.query || '') as string}"`;
+    case 'updateMemory':
+      return `id: ${args.id || ''}`;
     default: {
       // Generic fallback: show first meaningful value
       const firstValue = Object.values(args)[0];
@@ -79,11 +88,34 @@ function ToolCall({
 }
 
 export default function Chat() {
+  const router = useRouter();
   const [input, setInput] = useState('');
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const { messages, sendMessage } = useChat<BraneUIMessage>();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const session = await authClient.getSession();
+      if (!session.data) {
+        router.push('/login');
+      } else {
+        setIsAuthChecking(false);
+      }
+    };
+    checkAuth();
+  }, [router]);
+
+  if (isAuthChecking) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-white dark:bg-zinc-950">
+        <div className="text-zinc-500 dark:text-zinc-400">loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-zinc-950">
+      <TopBar />
       {/* Messages container */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-4">

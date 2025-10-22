@@ -1,4 +1,4 @@
-import { index, pgTable, serial, text, timestamp, vector, integer, boolean } from 'drizzle-orm/pg-core';
+import { index, pgTable, serial, text, timestamp, vector, boolean } from 'drizzle-orm/pg-core';
 
 export const memories = pgTable('memories', {
   id: serial('id').primaryKey(),
@@ -6,9 +6,9 @@ export const memories = pgTable('memories', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   text: text('text').notNull(),
-  embedding: vector('embedding', { dimensions: 1536 }),
+  embedding: vector('embedding', { dimensions: 3072 }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-}, 
+},
 (table) => [
     index('embeddingIndex').using('hnsw', table.embedding.op('vector_cosine_ops')),
 ]);
@@ -73,3 +73,5 @@ export const verification = pgTable("verification", {
     .notNull(),
 });
 
+export type SelectMemory = typeof memories.$inferSelect;
+export type InsertMemory = typeof memories.$inferInsert;
