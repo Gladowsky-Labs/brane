@@ -19,7 +19,8 @@ const brane_tools = {
             const results = await exa.searchAndContents(query, {text: true, type: "auto"});
             return results;
         }
-    }),
+    }), 
+    
 }
 
 const now = new Date();
