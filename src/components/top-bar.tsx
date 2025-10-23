@@ -58,9 +58,9 @@ export function TopBar() {
   if (!user) return null;
 
   return (
-    <div className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+    <div className="border-b border-zinc-200 dark:border-[#4A4A4B] bg-white dark:bg-[#1E1E1F]">
       <div className="px-6 py-4 flex items-center justify-between">
-        <div className="text-lg font-light text-zinc-900 dark:text-zinc-100">
+        <div className="text-lg font-light text-zinc-900 dark:text-[#E8E8E8]">
           brane
         </div>
 
@@ -69,7 +69,7 @@ export function TopBar() {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none"
           >
-            <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 text-xs font-medium">
+            <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-[#3A3A3B] flex items-center justify-center text-zinc-700 dark:text-[#BFC0BF] text-xs font-medium">
               {user.image ? (
                 <img
                   src={user.image}
@@ -83,18 +83,18 @@ export function TopBar() {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-lg overflow-hidden">
-              <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
-                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#2D2D2E] border border-zinc-200 dark:border-[#4A4A4B] rounded-xl shadow-lg overflow-hidden">
+              <div className="px-4 py-3 border-b border-zinc-200 dark:border-[#4A4A4B]">
+                <p className="text-sm font-medium text-zinc-900 dark:text-[#E8E8E8]">
                   {user.name}
                 </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                <p className="text-xs text-zinc-500 dark:text-[#BFC0BF] truncate">
                   {user.email}
                 </p>
               </div>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-3 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                className="w-full text-left px-4 py-3 text-sm text-zinc-700 dark:text-[#BFC0BF] hover:bg-zinc-50 dark:hover:bg-[#3A3A3B] transition-colors"
               >
                 sign out
               </button>

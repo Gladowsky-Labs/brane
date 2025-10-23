@@ -3,6 +3,15 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Light mode - minimal grays */
+  --bg-primary: #ffffff;
+  --bg-elevated: #f5f5f5;
+  --bg-hover: #ececec;
+  --border-color: #d4d4d4;
+  --text-primary: #2D2D2E;
+  --text-secondary: #5a5a5b;
+  --text-muted: #8a8a8b;
 }
 
 /* Map Tailwind theme tokens to your font variables */
@@ -21,8 +30,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Logo-based color palette */
+    --background: #1E1E1F;
+    --foreground: #BFC0BF;
+
+    /* Dark mode palette */
+    --bg-primary: #1E1E1F;      /* Main background - lighter than midnight */
+    --bg-elevated: #2D2D2E;      /* Logo dark - cards, dropdowns */
+    --bg-hover: #3A3A3B;         /* Hover states */
+    --border-color: #4A4A4B;     /* Borders */
+    --text-primary: #E8E8E8;     /* Bright text */
+    --text-secondary: #BFC0BF;   /* Logo light - secondary text */
+    --text-muted: #8A8A8B;       /* Muted text */
   }
 }
 
