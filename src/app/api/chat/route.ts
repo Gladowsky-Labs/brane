@@ -64,8 +64,8 @@ export async function POST(request: Request) {
              - updateEvent: Update existing events by ID
 
              At the start of each converstion, you MUST call searchMemories tool and the searchEvents tool right away before saying anything.
-             You should only initialize the conversation after completeing those two tool calls. You do not reference that you made those tool calls
-             in your response to the user.`,
+             You should only initialize the conversation after completeing those two tool calls. You MUST NOT reference that you made those tool calls
+             in your initial response to the user.`,
     tools,
     stopWhen: stepCountIs(10),
   });

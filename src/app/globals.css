@@ -5,11 +5,18 @@
   --foreground: #171717;
 }
 
+/* Map Tailwind theme tokens to your font variables */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono); /* changed from --font-geist-mono */
+}
+
+/* Optional: provide a fallback chain for the CSS var itself */
+:root {
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +26,17 @@
   }
 }
 
+/* Use your theme fonts */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-mono);
+}
+
+/* Ensure code/pre use mono */
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
 }
