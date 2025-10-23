@@ -9,7 +9,11 @@ interface User {
   image?: string;
 }
 
-export function TopBar() {
+interface TopBarProps {
+  onNewChat?: () => void;
+}
+
+export function TopBar({ onNewChat }: TopBarProps) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -60,8 +64,18 @@ export function TopBar() {
   return (
     <div className="border-b border-zinc-200 dark:border-[#4A4A4B] bg-white dark:bg-[#1E1E1F]">
       <div className="px-6 py-4 flex items-center justify-between">
-        <div className="text-lg font-light text-zinc-900 dark:text-[#E8E8E8]">
-          brane
+        <div className="flex items-center gap-4">
+          <div className="text-lg font-light text-zinc-900 dark:text-[#E8E8E8]">
+            brane
+          </div>
+          {onNewChat && (
+            <button
+              onClick={onNewChat}
+              className="text-sm text-zinc-600 dark:text-[#8A8A8B] hover:text-zinc-900 dark:hover:text-[#E8E8E8] transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-[#2D2D2E]"
+            >
+              new chat
+            </button>
+          )}
         </div>
 
         <div className="relative" ref={dropdownRef}>

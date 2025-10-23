@@ -1,6 +1,6 @@
 'use client';
 import { useChat } from '@ai-sdk/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import type { BraneUIMessage } from './api/chat/route';
 import { TopBar } from '@/components/top-bar';
@@ -88,13 +88,68 @@ function ToolCall({
   );
 }
 
+const STORAGE_KEY = 'brane-chat-messages';
+
 export default function Chat() {
   const router = useRouter();
   const [input, setInput] = useState('');
   const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const { messages, sendMessage } = useChat<BraneUIMessage>({
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Load initial messages from sessionStorage
+  const loadMessages = (): BraneUIMessage[] => {
+    if (typeof window === 'undefined') return [];
+    const stored = sessionStorage.getItem(STORAGE_KEY);
+    if (!stored) return [];
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return [];
+    }
+  };
+
+  const { messages, sendMessage, setMessages } = useChat<BraneUIMessage>({
     experimental_throttle: 50,
   });
+
+  // Load messages from sessionStorage on mount
+  useEffect(() => {
+    const storedMessages = loadMessages();
+    if (storedMessages.length > 0) {
+      setMessages(storedMessages);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save messages to sessionStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  // Function to start a new chat
+  const startNewChat = () => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    setMessages([]);
+  };
+
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    // Reset height to auto to get correct scrollHeight
+    textarea.style.height = 'auto';
+
+    // Calculate new height (max 6 lines)
+    const lineHeight = 24; // approximate line height in px
+    const maxLines = 6;
+    const maxHeight = lineHeight * maxLines;
+    const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+
+    textarea.style.height = `${newHeight}px`;
+  }, [input]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -118,7 +173,7 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-[#1E1E1F]">
-      <TopBar />
+      <TopBar onNewChat={startNewChat} />
       {/* Messages container */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-4">
@@ -194,17 +249,45 @@ export default function Chat() {
             }}
             className="relative"
           >
-            <input
-              className="w-full pl-4 pr-12 py-3 bg-zinc-100 dark:bg-[#2D2D2E] border border-zinc-200 dark:border-[#4A4A4B] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BFC0BF] focus:border-transparent text-zinc-900 dark:text-[#E8E8E8] placeholder-zinc-500 dark:placeholder-[#8A8A8B]"
+            <textarea
+              ref={textareaRef}
+              className="w-full pl-4 pr-24 py-3 bg-zinc-100 dark:bg-[#2D2D2E] border border-zinc-200 dark:border-[#4A4A4B] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BFC0BF] focus:border-transparent text-zinc-900 dark:text-[#E8E8E8] placeholder-zinc-500 dark:placeholder-[#8A8A8B] resize-none overflow-y-auto"
               value={input}
               placeholder="chat with brane..."
               onChange={e => setInput(e.currentTarget.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  const trimmed = input.trim();
+                  if (trimmed) {
+                    sendMessage({ text: trimmed });
+                    setInput('');
+                  }
+                }
+              }}
+              rows={1}
             />
-            <button
-              type="submit"
-              disabled={!input.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-zinc-400 dark:text-[#8A8A8B] hover:text-zinc-600 dark:hover:text-[#BFC0BF] focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-zinc-400 dark:disabled:hover:text-[#8A8A8B] transition-colors"
-            >
+            <div className="absolute right-2 bottom-2 flex items-center gap-1">
+              <button
+                type="button"
+                onClick={startNewChat}
+                className="p-2 rounded-lg text-zinc-400 dark:text-[#8A8A8B] hover:text-zinc-600 dark:hover:text-[#BFC0BF] focus:outline-none transition-colors"
+                title="Start new chat"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path d="M5.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM2.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM18.75 7.5a.75.75 0 00-1.5 0v2.25H15a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H21a.75.75 0 000-1.5h-2.25V7.5z" />
+                </svg>
+              </button>
+              <button
+                type="submit"
+                disabled={!input.trim()}
+                className="p-2 rounded-lg text-zinc-400 dark:text-[#8A8A8B] hover:text-zinc-600 dark:hover:text-[#BFC0BF] focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-zinc-400 dark:disabled:hover:text-[#8A8A8B] transition-colors"
+              >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -214,6 +297,7 @@ export default function Chat() {
                 <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
               </svg>
             </button>
+            </div>
           </form>
         </div>
       </div>
