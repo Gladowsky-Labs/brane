@@ -54,6 +54,8 @@ export async function POST(request: Request) {
              Use the provided tools to answer user queries to the best of your ability.
              If you don't know the answer, use the internet search tool to find relevant information.
 
+             IMPORTANT: Must respond in GFM (Github Flavored Markdown) format. Use LaTeX notation (enclosed in $ for inline or $$ for block) for mathematical expressions.
+
              You have access to the following tools:
              - searchInternet: Search the web for information
              - storeMemory: Store new memories about the user, you can use this without the user asking you too

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { BraneUIMessage } from './api/chat/route';
 import { TopBar } from '@/components/top-bar';
 import { authClient } from '@/lib/auth/client';
+import { MemoizedMarkdown } from '@/components/memoized-markdown';
 
 // Helper function to generate brief summaries from tool parameters
 function generateToolSummary(
@@ -91,7 +92,9 @@ export default function Chat() {
   const router = useRouter();
   const [input, setInput] = useState('');
   const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const { messages, sendMessage } = useChat<BraneUIMessage>();
+  const { messages, sendMessage } = useChat<BraneUIMessage>({
+    experimental_throttle: 50,
+  });
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -134,6 +137,20 @@ export default function Chat() {
                 {message.parts.map((part, i) => {
                   // Handle text parts
                   if (part.type === 'text') {
+                    // Use markdown for assistant messages, plain text for user
+                    if (message.role === 'assistant') {
+                      return (
+                        <div
+                          key={`${message.id}-${i}`}
+                          className="prose prose-sm dark:prose-invert max-w-none break-words"
+                        >
+                          <MemoizedMarkdown
+                            content={part.text}
+                            id={`${message.id}-${i}`}
+                          />
+                        </div>
+                      );
+                    }
                     return (
                       <div
                         key={`${message.id}-${i}`}
