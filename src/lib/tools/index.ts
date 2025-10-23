@@ -1,5 +1,5 @@
 /**
- * Tool Registry
+ * Tools
  * Central location for all tools available to the agent
  */
 
@@ -7,6 +7,9 @@ import { searchInternetTool } from './search-internet';
 import { createStoreMemoryTool } from './memories/store';
 import { createSearchMemoriesTool } from './memories/search';
 import { createUpdateMemoryTool } from './memories/update';
+import { createStoreEventTool } from './events/store';
+import { createSearchEventsTool } from './events/search';
+import { createUpdateEventTool } from './events/update';
 
 /**
  * Create a toolset for a specific user
@@ -18,6 +21,9 @@ export function createToolset(userId: string) {
     storeMemory: createStoreMemoryTool(userId),
     searchMemories: createSearchMemoriesTool(userId),
     updateMemory: createUpdateMemoryTool(userId),
+    storeEvent: createStoreEventTool(userId),
+    searchEvents: createSearchEventsTool(userId),
+    updateEvent: createUpdateEventTool(userId),
   };
 }
 

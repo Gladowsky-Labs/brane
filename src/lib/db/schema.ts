@@ -6,12 +6,34 @@ export const memories = pgTable('memories', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   text: text('text').notNull(),
-  embedding: vector('embedding', { dimensions: 3072 }),
+  embedding: vector('embedding', { dimensions: 1536 }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 },
 (table) => [
-    index('embeddingIndex').using('hnsw', table.embedding.op('vector_cosine_ops')),
+    index('memoriesEmbeddingIndex').using('hnsw', table.embedding.op('vector_cosine_ops')),
 ]);
+
+export const events = pgTable('events', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  embedding: vector('embedding', { dimensions: 1536 }),
+  startTime: timestamp('start_time').notNull(),
+  endTime: timestamp('end_time').notNull(),
+  eventType: text('event_type').notNull(), // meeting, appointment, assignment, deadline, reminder
+  status: text('status').notNull().default('upcoming'), // upcoming, completed, cancelled
+  location: text('location'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .$onUpdate(() => new Date())
+    .notNull(),
+}, (table) => [
+  index('userEventsIndex').on(table.userId, table.startTime),
+  index('eventsEmbeddingIndex').using('hnsw', table.embedding.op('vector_cosine_ops')),
+],);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -75,3 +97,6 @@ export const verification = pgTable("verification", {
 
 export type SelectMemory = typeof memories.$inferSelect;
 export type InsertMemory = typeof memories.$inferInsert;
+
+export type SelectEvent = typeof events.$inferSelect;
+export type InsertEvent = typeof events.$inferInsert;

@@ -5,11 +5,11 @@ import type { MemorySearchResult } from '../types';
 
 /**
  * Generate embedding for a text string
- * Currently uses 'google/gemini-embedding-001' model, returns 3072-dimensional vector
+ * Currently uses 'cohere/embed-v4.0' model, returns 1536-dimensional vector
  */
 export async function embedText(text: string): Promise<number[]> {
   const result = await embed({
-    model: 'google/gemini-embedding-001',
+    model: process.env.EMBEDDING_MODEL || 'cohere/embed-v4.0',
     value: text,
   });
   return result.embedding;

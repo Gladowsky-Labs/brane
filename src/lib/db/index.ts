@@ -15,4 +15,4 @@ export const db = drizzle({ client });
 
 // Export schema for use in queries
 export { schema };
-export const { memories: memoriesTable, user: userTable, session: sessionTable, account: accountTable, verification: verificationTable } = schema;
+export const { events: eventsTable, memories: memoriesTable, user: userTable, session: sessionTable, account: accountTable, verification: verificationTable } = schema;

@@ -39,6 +39,14 @@ export async function POST(request: Request) {
   // Create toolset with user context
   const tools = createToolset(userId);
 
+  // Check if this is the first user message in the conversation
+  const isFirstMessage = messages.filter((m: any) => m.role === 'user').length === 1;
+
+  console.log('=== CHAT REQUEST ===');
+  console.log('isFirstMessage:', isFirstMessage);
+  console.log('Total messages:', messages.length);
+  console.log('User messages:', messages.filter((m: any) => m.role === 'user').length);
+
   // Create agent with user-specific tools
   const brane = new Agent({
     model: "moonshotai/kimi-k2-0905",
@@ -51,10 +59,15 @@ export async function POST(request: Request) {
              - storeMemory: Store new memories about the user, you can use this without the user asking you too
              - searchMemories: Search for relevant memories about the user
              - updateMemory: Update existing memories by ID
-             
-             On initial user greetings, you may want to search for relevant memories to personalize your response. (USE THE searchMemories TOOL)`,
+             - storeEvent: Store new events related to the user
+             - searchEvents: Search for relevant events
+             - updateEvent: Update existing events by ID
+
+             At the start of each converstion, you MUST call searchMemories tool and the searchEvents tool right away before saying anything.
+             You should only initialize the conversation after completeing those two tool calls. You do not reference that you made those tool calls
+             in your response to the user.`,
     tools,
-    stopWhen: stepCountIs(5),
+    stopWhen: stepCountIs(10),
   });
 
   return brane.respond({
