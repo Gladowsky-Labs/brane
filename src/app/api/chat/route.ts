@@ -8,6 +8,17 @@ import {
 import { auth } from '@/lib/auth';
 import { createToolset, type Toolset } from '@/lib/tools';
 
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export async function loadMarkdownPrompt(relPath: string): Promise<string> {
+  const abs = path.join(__dirname, relPath);
+  return await readFile(abs, "utf8");
+}
+
 export type BraneUIMessage = InferAgentUIMessage<Toolset>;
 
 const now = new Date();
@@ -40,34 +51,18 @@ export async function POST(request: Request) {
   const tools = createToolset(userId);
 
   // Check if this is the first user message in the conversation
-  const isFirstMessage = messages.filter((m: any) => m.role === 'user').length === 1;
+  // const isFirstMessage = messages.filter((m: any) => m.role === 'user').length === 1;
 
-  console.log('=== CHAT REQUEST ===');
-  console.log('isFirstMessage:', isFirstMessage);
-  console.log('Total messages:', messages.length);
-  console.log('User messages:', messages.filter((m: any) => m.role === 'user').length);
+  // console.log('=== CHAT REQUEST ===');
+  // console.log("Model:", process.env.CHAT_MODEL || "openai/gpt-4.1-nano");
+
+  let systemPrompt = await loadMarkdownPrompt("../../../lib/prompts/jarvis.md");
+  systemPrompt = systemPrompt + `Todays date: ${localDateTime}.`;
 
   // Create agent with user-specific tools
   const brane = new Agent({
-    model: "moonshotai/kimi-k2-0905",
-    system: `You are a helpful assistant named brane. The current date is ${localDateTime}.
-             Use the provided tools to answer user queries to the best of your ability.
-             If you don't know the answer, use the internet search tool to find relevant information.
-
-             IMPORTANT: Must respond in GFM (Github Flavored Markdown) format. Use LaTeX notation (enclosed in $ for inline or $$ for block) for mathematical expressions.
-
-             You have access to the following tools:
-             - searchInternet: Search the web for information
-             - storeMemory: Store new memories about the user, you can use this without the user asking you too
-             - searchMemories: Search for relevant memories about the user
-             - updateMemory: Update existing memories by ID
-             - storeEvent: Store new events related to the user
-             - searchEvents: Search for relevant events
-             - updateEvent: Update existing events by ID
-
-             At the start of each converstion, you MUST call searchMemories tool and the searchEvents tool right away before saying anything.
-             You should only initialize the conversation after completeing those two tool calls. You MUST NOT reference that you made those tool calls
-             in your initial response to the user.`,
+    model: process.env.CHAT_MODEL || "openai/gpt-4.1-nano",
+    system: systemPrompt,
     tools,
     stopWhen: stepCountIs(10),
   });
