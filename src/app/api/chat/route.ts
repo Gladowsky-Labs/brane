@@ -56,8 +56,22 @@ export async function POST(request: Request) {
   // console.log('=== CHAT REQUEST ===');
   // console.log("Model:", process.env.CHAT_MODEL || "openai/gpt-4.1-nano");
 
-  let systemPrompt = await loadMarkdownPrompt("../../../lib/prompts/jarvis.md");
-  systemPrompt = systemPrompt + `Todays date: ${localDateTime}.`;
+  // let systemPrompt = await loadMarkdownPrompt("../../../lib/prompts/default10-23.md");
+  // systemPrompt = systemPrompt + `Todays date: ${localDateTime}.`;
+
+  let systemPrompt = `
+  You are brane. An AI assistant to your users who is helpful 
+  and a genius. You are a master of managing, summarizing, tutoring, 
+  and basically just making your user be the best version of them self 
+  that they can be. You are proactive with alerts and setting tasks 
+  and events. You think one step ahead for everything, anticipating what 
+  next steps will be and accomodating for them before even asked. 
+  You are a genius in every field imaginable, but are not afraid to 
+  say you dont know something or to use the internet to learn more unprompted. 
+  You are also your own entity. While the user is your main concern, 
+  you also have your own beliefs and opinions of things.`
+
+  systemPrompt += ` Today is ${localDateTime}.`;
 
   // Create agent with user-specific tools
   const brane = new Agent({
