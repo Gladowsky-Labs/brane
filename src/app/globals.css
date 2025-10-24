@@ -50,7 +50,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-mono);
+  font-family: var(--font-geist-sans);
 }
 
 /* Ensure code/pre use mono */
@@ -63,33 +63,57 @@ samp {
 
 /* Markdown styling for chat messages */
 .prose {
+  /* Better base typography */
+  line-height: 1.6;
+  color: inherit;
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+
+  /* Paragraphs */
+  p {
+    margin-bottom: 1rem;
+  }
+
   /* Inline code */
   code {
-    background-color: #f5f5f5;
-    color: #2D2D2E;
-    padding: 0.15rem 0.35rem;
-    border-radius: 0.25rem;
-    font-size: 0.875em;
+    background-color: #f3f4f6;
+    color: #374151;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.375rem;
+    font-size: 0.9em;
     font-weight: 500;
+    border: 1px solid #e5e7eb;
   }
 
   /* Code blocks */
   pre {
-    background-color: #f5f5f5;
-    border: 1px solid #d4d4d4;
-    border-radius: 0.5rem;
-    padding: 1rem;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
     overflow-x: auto;
-    margin: 1rem 0;
+    margin: 1.25rem 0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
   }
 
   pre code {
     background-color: transparent;
-    color: #2D2D2E;
+    color: #374151;
     padding: 0;
     border-radius: 0;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 400;
+    border: none;
   }
 
   /* Tables */
@@ -171,20 +195,21 @@ samp {
   .prose {
     /* Inline code */
     code {
-      background-color: #2D2D2E;
-      color: #E8E8E8;
-      border: 1px solid #4A4A4B;
+      background-color: #374151;
+      color: #e5e7eb;
+      border: 1px solid #4b5563;
     }
 
     /* Code blocks */
     pre {
-      background-color: #2D2D2E;
-      border: 1px solid #4A4A4B;
+      background-color: #1f2937;
+      border: 1px solid #374151;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
     }
 
     pre code {
       background-color: transparent;
-      color: #E8E8E8;
+      color: #e5e7eb;
       border: none;
     }
 
@@ -220,4 +245,25 @@ samp {
       color: #93c5fd;
     }
   }
+}
+
+/* Hide scrollbars globally */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }

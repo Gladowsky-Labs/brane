@@ -47,24 +47,25 @@ function ToolCall({
   return (
     <div
       onClick={() => setIsExpanded(!isExpanded)}
-      className="text-xs bg-zinc-100 dark:bg-[#2D2D2E] rounded-md p-2.5 border border-zinc-200 dark:border-[#4A4A4B] cursor-pointer hover:bg-zinc-150 dark:hover:bg-[#3A3A3B] transition-colors my-2"
+      className="text-sm bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 my-3 shadow-sm"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-zinc-600 dark:text-[#BFC0BF] font-mono text-[11px]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-2 h-2 bg-gray-500 rounded-full flex-shrink-0"></div>
+          <span className="text-gray-700 dark:text-gray-300 font-medium text-sm">
             {toolName}
           </span>
           {summary && (
             <>
-              <span className="text-zinc-300 dark:text-[#5A5A5B]">·</span>
-              <span className="text-zinc-500 dark:text-[#8A8A8B] truncate text-[11px]">
+              <span className="text-gray-400 dark:text-gray-500">·</span>
+              <span className="text-gray-600 dark:text-gray-400 truncate text-sm">
                 {summary}
               </span>
             </>
           )}
         </div>
         <svg
-          className={`w-3.5 h-3.5 text-zinc-400 dark:text-[#8A8A8B] transition-transform flex-shrink-0 ${
+          className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform flex-shrink-0 ${
             isExpanded ? 'rotate-180' : ''
           }`}
           fill="none"
@@ -80,7 +81,7 @@ function ToolCall({
         </svg>
       </div>
       {isExpanded && (
-        <pre className="mt-2.5 pt-2.5 border-t border-zinc-200 dark:border-[#4A4A4B] text-zinc-600 dark:text-[#BFC0BF] overflow-x-auto text-[10px] font-mono">
+        <pre className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 overflow-x-auto text-xs font-mono bg-gray-100 dark:bg-gray-900/50 rounded-lg p-3">
           {JSON.stringify(part, null, 2)}
         </pre>
       )}
@@ -172,73 +173,148 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-[#1E1E1F]">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-[#1E1E1F]">
       <TopBar onNewChat={startNewChat} />
-      {/* Messages container */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-3xl mx-auto space-y-4">
-          {messages.map(message => (
-            <div
-              key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[100%] ${
-                  message.role === 'user'
-                    ? 'bg-zinc-600 dark:bg-[#3A3A3B] text-white dark:text-[#E8E8E8] rounded-2xl px-4 py-3'
-                    : 'text-zinc-900 dark:text-[#E8E8E8]'
-                }`}
-              >
-                {message.parts.map((part, i) => {
-                  // Handle text parts
-                  if (part.type === 'text') {
-                    // Use markdown for assistant messages, plain text for user
-                    if (message.role === 'assistant') {
-                      return (
-                        <div
-                          key={`${message.id}-${i}`}
-                          className="prose prose-sm dark:prose-invert max-w-none break-words"
-                        >
-                          <MemoizedMarkdown
-                            content={part.text}
-                            id={`${message.id}-${i}`}
-                          />
-                        </div>
-                      );
-                    }
-                    return (
-                      <div
-                        key={`${message.id}-${i}`}
-                        className="whitespace-pre-wrap break-words"
-                      >
-                        {part.text}
-                      </div>
-                    );
-                  }
 
-                  // Handle all tool calls dynamically
-                  if (part.type.startsWith('tool-')) {
-                    const toolName = part.type.replace('tool-', '');
-                    return (
-                      <ToolCall
-                        key={`${message.id}-${i}`}
-                        toolName={toolName}
-                        part={part}
-                      />
-                    );
-                  }
-
-                  return null;
-                })}
+      {/* Main chat area */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+          {messages.length === 0 ? (
+            // Welcome screen when no messages
+            <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center">
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-gray-800 dark:bg-gray-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                  <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                <h1 className="text-3xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Good morning, Jack
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  How can I help you today?
+                </p>
               </div>
             </div>
-          ))}
+          ) : (
+            // Messages
+            <div className="space-y-8">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  {message.role === 'assistant' && (
+                    <div className="w-8 h-8 bg-gray-600 dark:bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                    </div>
+                  )}
+
+                  <div
+                    className={`max-w-[85%] sm:max-w-[75%] ${
+                      message.role === 'user'
+                        ? 'bg-gray-700 dark:bg-gray-600 text-white rounded-3xl px-4 sm:px-6 py-3 shadow-sm'
+                        : 'bg-white dark:bg-gray-800 rounded-3xl px-4 sm:px-6 py-4 shadow-sm border border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    {message.parts.map((part, i) => {
+                      // Handle text parts
+                      if (part.type === 'text') {
+                        // Use markdown for assistant messages, plain text for user
+                        if (message.role === 'assistant') {
+                          return (
+                            <div
+                              key={`${message.id}-${i}`}
+                              className="prose prose-gray dark:prose-invert max-w-none text-gray-800 dark:text-gray-100"
+                            >
+                              <MemoizedMarkdown
+                                content={part.text}
+                                id={`${message.id}-${i}`}
+                              />
+                            </div>
+                          );
+                        }
+                        return (
+                          <div
+                            key={`${message.id}-${i}`}
+                            className="whitespace-pre-wrap break-words font-medium"
+                          >
+                            {part.text}
+                          </div>
+                        );
+                      }
+
+                      // Handle all tool calls dynamically
+                      if (part.type.startsWith('tool-')) {
+                        const toolName = part.type.replace('tool-', '');
+                        return (
+                          <ToolCall
+                            key={`${message.id}-${i}`}
+                            toolName={toolName}
+                            part={part}
+                          />
+                        );
+                      }
+
+                      return null;
+                    })}
+                  </div>
+
+                  {message.role === 'user' && (
+                    <div className="w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-white font-medium text-sm">J</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Input form */}
-      <div className="border-t border-zinc-200 dark:border-[#4A4A4B] bg-white dark:bg-[#1E1E1F]">
-        <div className="max-w-3xl mx-auto px-4 py-4">
+      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1E1E1F]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          {/* Quick chat buttons - only show on new chat */}
+          {messages.length === 0 && (
+            <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6 flex-wrap justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  const text = "What's my agenda look like?";
+                  sendMessage({ text });
+                  setInput('');
+                }}
+                className="px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-2xl hover:bg-gray-150 dark:hover:bg-gray-700 transition-all duration-200 whitespace-nowrap shadow-sm hover:shadow-md"
+              >
+                📅 What's my agenda look like?
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const text = "Explain a concept to me";
+                  sendMessage({ text });
+                  setInput('');
+                }}
+                className="px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-2xl hover:bg-gray-150 dark:hover:bg-gray-700 transition-all duration-200 whitespace-nowrap shadow-sm hover:shadow-md"
+              >
+                🧠 Explain a concept to me
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const text = "Help me solve a problem";
+                  sendMessage({ text });
+                  setInput('');
+                }}
+                className="px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-2xl hover:bg-gray-150 dark:hover:bg-gray-700 transition-all duration-200 whitespace-nowrap shadow-sm hover:shadow-md"
+              >
+                💡 Help me solve a problem
+              </button>
+            </div>
+          )}
           <form
             onSubmit={e => {
               e.preventDefault();
@@ -249,56 +325,56 @@ export default function Chat() {
             }}
             className="relative"
           >
-            <textarea
-              ref={textareaRef}
-              className="w-full pl-4 pr-24 py-3 bg-zinc-100 dark:bg-[#2D2D2E] border border-zinc-200 dark:border-[#4A4A4B] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BFC0BF] focus:border-transparent text-zinc-900 dark:text-[#E8E8E8] placeholder-zinc-500 dark:placeholder-[#8A8A8B] resize-none overflow-y-auto"
-              value={input}
-              placeholder="chat with brane..."
-              onChange={e => setInput(e.currentTarget.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  const trimmed = input.trim();
-                  if (trimmed) {
-                    sendMessage({ text: trimmed });
-                    setInput('');
+            <div className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-3xl shadow-lg focus-within:shadow-xl transition-all duration-200 overflow-hidden">
+              <textarea
+                ref={textareaRef}
+                className="w-full pl-6 pr-16 py-4 bg-transparent border-none focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 resize-none overflow-y-auto scrollbar-hide text-base"
+                value={input}
+                placeholder="Message brane..."
+                onChange={e => setInput(e.currentTarget.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const trimmed = input.trim();
+                    if (trimmed) {
+                      sendMessage({ text: trimmed });
+                      setInput('');
+                    }
                   }
-                }
-              }}
-              rows={1}
-            />
-            <div className="absolute right-2 bottom-2 flex items-center gap-1">
+                }}
+                rows={1}
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="p-2 rounded-full bg-gray-600 hover:bg-gray-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white transition-all duration-200 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {/* Optional: Add new chat button below input */}
+          {messages.length > 0 && (
+            <div className="flex justify-center mt-4">
               <button
                 type="button"
                 onClick={startNewChat}
-                className="p-2 rounded-lg text-zinc-400 dark:text-[#8A8A8B] hover:text-zinc-600 dark:hover:text-[#BFC0BF] focus:outline-none transition-colors"
-                title="Start new chat"
+                className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path d="M5.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM2.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM18.75 7.5a.75.75 0 00-1.5 0v2.25H15a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H21a.75.75 0 000-1.5h-2.25V7.5z" />
-                </svg>
+                Start new conversation
               </button>
-              <button
-                type="submit"
-                disabled={!input.trim()}
-                className="p-2 rounded-lg text-zinc-400 dark:text-[#8A8A8B] hover:text-zinc-600 dark:hover:text-[#BFC0BF] focus:outline-none disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-zinc-400 dark:disabled:hover:text-[#8A8A8B] transition-colors"
-              >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5"
-              >
-                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-              </svg>
-            </button>
             </div>
-          </form>
+          )}
         </div>
       </div>
     </div>
